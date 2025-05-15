@@ -33,6 +33,17 @@ export default function Cart() {
     }
   };
 
+  const handleQuantityChange = async (itemId, newQuantity) => {
+    try {
+      await axios.put(`http://localhost:3002/cart/${itemId}`, { quantity: newQuantity });
+      // Refresh cart
+      const response = await axios.get('http://localhost:3002/cart');
+      setCartItems(response.data);
+    } catch (error) {
+      console.error('Error updating quantity:', error);
+    }
+  };
+
   const handleCheckout = () => {
     navigate('/checkout');
   };
@@ -77,7 +88,25 @@ export default function Cart() {
                     />
                     <div className="ml-4">
                       <h3 className="text-sm font-medium text-gray-900">{item.name}</h3>
-                      <p className="text-sm text-gray-500">${item.price}</p>
+                      <div className="flex items-center space-x-4">
+                        <p className="text-sm text-gray-500">${item.price}</p>
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                            disabled={item.quantity <= 1}
+                            className="p-1 rounded-md bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            -
+                          </button>
+                          <span className="text-sm text-gray-700 px-2">{item.quantity}</span>
+                          <button
+                            onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                            className="p-1 rounded-md bg-gray-100 hover:bg-gray-200"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">

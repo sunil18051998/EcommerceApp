@@ -1,4 +1,4 @@
-import { getState, setState, addOrder, removeOrder, updateOrder } from '../state';
+import { getState, setState, addOrder, removeOrder, updateOrder } from '../state/index.js';
 
 const stateMiddleware = (req, res, next) => {
     req.getState = getState;

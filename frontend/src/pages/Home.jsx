@@ -9,7 +9,7 @@ export default function Home() {
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
       try {
-        const response = await fetch('http://localhost:3003/products/featured');
+        const response = await fetch('http://localhost:3004/products/featured');
         const data = await response.json();
         setFeaturedProducts(data);
       } catch (error) {
@@ -54,11 +54,11 @@ export default function Home() {
                 className="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200 cursor-pointer"
                 onClick={() => handleViewProduct(product.id)}
               >
-                <div className="aspect-w-1 aspect-h-1 bg-gray-200 group-hover:opacity-75">
+                <div className="h-72 bg-gray-200 group-hover:opacity-75">
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="object-cover object-center w-full h-full"
+                    className="object-cover object-center w-full h-72"
                   />
                 </div>
                 <div className="p-4">

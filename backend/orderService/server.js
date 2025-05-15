@@ -2,7 +2,8 @@ import express from 'express';
 import dotenv from 'dotenv';
 dotenv.config();
 import cors from 'cors';
-import stateMiddleware from './middleware/stateMiddleware';
+import stateMiddleware from './middleware/stateMiddleware.js';
+import orderRoutes from './routes/orderRoutes.js';
 
 const app = express();
 const port = process.env.PORT || 3002;
@@ -10,6 +11,8 @@ const port = process.env.PORT || 3002;
 app.use(cors());
 app.use(express.json());
 app.use(stateMiddleware);
+
+app.use('/cart', orderRoutes);
 
 // Basic order endpoints
 app.get('/orders', (req, res) => {

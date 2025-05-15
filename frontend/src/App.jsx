@@ -7,11 +7,12 @@ import Register from './pages/Register';
 import Products from './pages/Products';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
-import { AuthProvider } from './context/AuthContext';
+import ReduxProvider from './components/ReduxProvider';
+import ProductDetail from './pages/ProductDetail';
 
 function App() {
   return (
-    <AuthProvider>
+    <ReduxProvider>
       <Router>
         <div className="min-h-screen bg-gray-100">
           <Navbar />
@@ -24,11 +25,12 @@ function App() {
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="*" element={<Navigate to="/" replace />} />
+              <Route path="/products/:id" element={<ProductDetail />} />
             </Routes>
           </main>
         </div>
       </Router>
-    </AuthProvider>
+    </ReduxProvider>
   );
 }
 
