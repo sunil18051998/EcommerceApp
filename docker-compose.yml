@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - api-gateway
+
+  api-gateway:
+    build:
+      context: ./backend/apiGateway
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - auth-service
+      - product-service
+      - order-service
+      - payment-service
+
+  auth-service:
+    build:
+      context: ./backend/authService
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+
+  product-service:
+    build:
+      context: ./backend/productService
+      dockerfile: Dockerfile
+    ports:
+      - "3004:3004"
+    environment:
+      - NODE_ENV=production
+
+  order-service:
+    build:
+      context: ./backend/orderService
+      dockerfile: Dockerfile
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=production
+
+  payment-service:
+    build:
+      context: ./backend/paymentService
+      dockerfile: Dockerfile
+    ports:
+      - "3005:3005"
+    environment:
+      - NODE_ENV=production
+
+networks:
+  default:
+    driver: bridge
