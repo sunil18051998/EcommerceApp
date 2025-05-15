@@ -7,6 +7,19 @@ export default function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [showZoom, setShowZoom] = useState(false);
+  const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 });
+  const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    if (product?.image) {
+      const img = new Image();
+      img.src = product.image;
+      img.onload = () => {
+        setImageSize({ width: img.width, height: img.height });
+      };
+    }
+  }, [product]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -26,7 +39,6 @@ export default function ProductDetail() {
   const handleAddToCart = async () => {
     try {
       await axios.post('http://localhost:3002/cart', { productId: id, quantity });
-      // You might want to show a success message or update cart count in the UI
     } catch (error) {
       console.error('Error adding to cart:', error);
     }
@@ -54,23 +66,49 @@ export default function ProductDetail() {
         {/* Product Images */}
         <div className="flex flex-col space-y-4">
           <div className="relative h-96 w-full">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="object-cover object-center w-full h-full rounded-lg"
-            />
-            <div className="absolute top-4 left-4 bg-white px-3 py-1 rounded-full text-sm text-gray-600">
-              {product.category}
-            </div>
-          </div>
-          <div className="flex space-x-2">
-            {/* Add image thumbnails here if needed */}
-            <div className="relative w-24 h-24">
-              <img
-                src={product.image}
-                alt={product.name}
-                className="object-cover object-center w-full h-full rounded-lg"
-              />
+            <div className="relative group">
+              <div className="relative w-full h-full">
+                {product && (
+                  <>
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="object-cover object-center w-full h-full rounded-lg cursor-zoom-in"
+                      onMouseEnter={(e) => {
+                        setShowZoom(true);
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        setImageSize({
+                          width: rect.width,
+                          height: rect.height
+                        });
+                      }}
+                      onMouseLeave={() => setShowZoom(false)}
+                      onMouseMove={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const x = (e.clientX - rect.left) / rect.width;
+                        const y = (e.clientY - rect.top) / rect.height;
+                        setHoverPosition({ x, y });
+                      }}
+                    />
+                    <div className="absolute top-4 left-4 bg-white px-3 py-1 rounded-full text-sm text-gray-600">
+                      {product.category}
+                    </div>
+                  </>
+                )}
+              </div>
+              {showZoom && product && (
+                <div className="absolute right-0 top-0 w-full h-full bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+                  <div
+                    className="absolute w-full h-full"
+                    style={{
+                      backgroundImage: `url(${product.image})`,
+                      backgroundSize: `${imageSize.width * 2}px ${imageSize.height * 2}px`,
+                      backgroundPosition: `${-hoverPosition.x * imageSize.width}px ${-hoverPosition.y * imageSize.height}px`,
+                      transition: 'background-position 0.1s ease'
+                    }}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -81,7 +119,6 @@ export default function ProductDetail() {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
             <p className="text-gray-500">{product.category}</p>
           </div>
-
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <span className="text-2xl font-bold text-indigo-600">${product.price}</span>
@@ -95,7 +132,6 @@ export default function ProductDetail() {
               <span className="text-sm text-gray-500">(234)</span>
             </div>
           </div>
-
           <div className="space-y-4">
             <p className="text-gray-600">{product.description}</p>
             <div className="space-y-2">
@@ -103,29 +139,24 @@ export default function ProductDetail() {
               <ul className="list-disc list-inside text-gray-600 space-y-1">
                 <li>High quality materials</li>
                 <li>1 year warranty</li>
-                <li>Free shipping</li>
-                <li>30-day return policy</li>
+                <li>Fast shipping</li>
               </ul>
             </div>
-          </div>
-
-          <div className="space-y-4">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setQuantity(quantity - 1)}
-                  disabled={quantity <= 1}
-                  className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                <label htmlFor="quantity" className="text-sm font-medium text-gray-700">Quantity:</label>
+                <select
+                  id="quantity"
+                  value={quantity}
+                  onChange={(e) => setQuantity(Number(e.target.value))}
+                  className="block w-24 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 >
-                  -
-                </button>
-                <span className="text-lg font-medium">{quantity}</span>
-                <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="p-2 rounded-full bg-gray-100 hover:bg-gray-200"
-                >
-                  +
-                </button>
+                  {[...Array(10)].map((_, i) => (
+                    <option key={i} value={i + 1}>
+                      {i + 1}
+                    </option>
+                  ))}
+                </select>
               </div>
               <button
                 onClick={handleAddToCart}
