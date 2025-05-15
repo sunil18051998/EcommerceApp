@@ -17,10 +17,10 @@ app.use('/auth', (req, res) => {
   proxy.web(req, res, { target: 'http://localhost:3001' }); // Auth service
 });
 app.use('/products', (req, res) => {
-  proxy.web(req, res, { target: 'http://localhost:3002' }); // Product service
+  proxy.web(req, res, { target: 'http://localhost:3004' }); // Product service
 });
-app.use('/orders', (req, res) => {
-   proxy.web(req, res, { target: 'http://localhost:3003' });  // Order Service
+app.use('/cart', (req, res) => {
+   proxy.web(req, res, { target: 'http://localhost:3002' });  // Order Service
 });
 
 app.listen(port, () => {
