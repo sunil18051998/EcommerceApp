@@ -1,65 +1,65 @@
-version: '3.8'
+version: "3.8"
 
 services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
     ports:
-      - "3006:80"
+      - "8080:80" # Host port 8080 -> Container port 80
     depends_on:
       - api-gateway
 
   api-gateway:
     build:
       context: ./backend/apiGateway
-      dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "3000:3000" # Gateway exposed to client
     environment:
       - NODE_ENV=production
+      - PORT=3000
     depends_on:
       - auth-service
-      - product-service
       - order-service
+      - product-service
       - payment-service
 
   auth-service:
     build:
       context: ./backend/authService
-      dockerfile: Dockerfile
     ports:
       - "3001:3001"
     environment:
       - NODE_ENV=production
-
-  product-service:
-    build:
-      context: ./backend/productService
-      dockerfile: Dockerfile
-    ports:
-      - "3004:3004"
-    environment:
-      - NODE_ENV=production
+      - PORT=3001
 
   order-service:
     build:
       context: ./backend/orderService
-      dockerfile: Dockerfile
     ports:
-      - "3003:3003"
+      - "3002:3002"
     environment:
       - NODE_ENV=production
+      - PORT=3002
+    depends_on:
+      - auth-service
+      - product-service
+
+  product-service:
+    build:
+      context: ./backend/productService
+    ports:
+      - "3004:3004"
+    environment:
+      - NODE_ENV=production
+      - PORT=3004
 
   payment-service:
     build:
       context: ./backend/paymentService
-      dockerfile: Dockerfile
     ports:
-      - "3005:3005"
+      - "3003:3003"
     environment:
       - NODE_ENV=production
-
-networks:
-  default:
-    driver: bridge
+      - PORT=3003
+    depends_on:
+      - order-service
